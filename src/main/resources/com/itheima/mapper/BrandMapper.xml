@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+    namespace:名称空间
+-->
+
+<mapper namespace="com.itheima.mapper.BrandMapper">
+
+    <!-- sql片段 -->
+    <sql id="brand_column">
+        id,brand_name as brandName
+    </sql>
+
+    <insert id="add" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_brand (brand_name, company_name, ordered, description, status)
+        values (#{brandName}, #{companyName},#{ordered}, #{description}, #{status})
+    </insert>
+
+    <update id="update">
+        update tb_brand
+        set
+            brand_name = #{brandName};
+            company_name = #{companyName};
+            ordered = #{ordered};
+            description = #{description};
+            status = #{status};
+        where id = #{id}
+    </update>
+
+    <!--
+        resultMap:
+        1.定义<resultMap>标签
+        2.在select标签中，使用resultMap替换resultType
+
+    -->
+    <!--
+        id：唯一标识，type：映射的类型，支持别名（mybatis-config里面定义）
+    -->
+    <resultMap id="brandResultMap" type="brand">
+        <!--
+            id：主键映射
+            result：一般字段映射
+                column: 表的列名
+                property：实体类的属性名
+        -->
+        <result column="brand_name" property="brandName"/>
+        <result column="company_name" property="companyName"/>
+    </resultMap>
+    <!--select id="selectAll" resultMap="brandResultMap">
+        select <include refid="brand_column">
+    </include>
+        from tb_brand;
+    </select-->
+
+    <select id="selectAll" resultMap="brandResultMap">
+        select *
+        from tb_brand;
+    </select>
+    <select id="selectByIdBrand" resultMap="brandResultMap">
+        select *
+        from tb_brand where id &lt;
+        #{id}      <!--{}中的字符串和接口方法的参数名称保持一致-->
+    </select>
+    <select id="selectByCondition" resultMap="brandResultMap">
+        select *
+        from tb_brand
+        <where>
+        <if test="status != null">
+            status = #{status}
+        </if>
+        <if test="companyName != null and companyName != '' ">
+            and company_name like #{companyName}
+        </if>
+        <if test="brandName != null and brandName != '' ">
+            and brand_name like #{brandName}
+        </if>
+        </where>
+    </select>
+</mapper>
